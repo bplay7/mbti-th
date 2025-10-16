@@ -38,7 +38,7 @@
     <canvas id="bg-canvas"></canvas>
     
     <!-- Audio element for background music -->
-    <audio id="background-music" loop preload="auto">
+    <audio id="background-music" loop>
         <!-- Instrumental Music -->
         <source src="https://khoj-pro.s3.us-west-2.amazonaws.com/62a6288f-f56d-4950-b66b-45233118f154/sound.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
@@ -47,8 +47,8 @@
     <!-- Top Right Controls: Language & Music -->
     <div id="top-right-controls">
         <div id="language-switcher" class="flex items-center gap-2">
-            <button class="control-btn active" data-lang="th" onclick="setLanguage('th')">ไทย</button>
-            <button class="control-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
+            <button class="control-btn active" onclick="setLanguage('th')">ไทย</button>
+            <button class="control-btn" onclick="setLanguage('en')">EN</button>
         </div>
         <button id="music-toggle-btn" class="control-btn">
             <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
@@ -93,7 +93,7 @@
     </div>
 
     <script>
-        // --- Canvas Background Script (No changes) ---
+        // --- Canvas Background Script (No changes needed) ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let stars = [], mouse = { x: undefined, y: undefined };
@@ -188,8 +188,7 @@
         let currentQuestionIndex = 0;
         let userAnswers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
         let currentLanguage = 'th';
-        let lastResultType = null;
-        let hasInteracted = false; // Flag to track user interaction
+        let lastResultType = null; // เพิ่มตัวแปรสำหรับเก็บผลลัพธ์ล่าสุด
 
         const icons = {
             E: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
@@ -201,9 +200,27 @@
             J: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
             P: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`
         };
+
         const resultIcons = {
-            "ISTJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>`, "ISFJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`, "INFJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/><path d="M12 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>`, "INTJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20z"/><path d="M2 12h20"/></svg>`, "ISTP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`, "ISFP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 7.85l-4.24-4.24a2 2 0 0 0-2.83 0l-2.83 2.83a2 2 0 0 0 0 2.83l4.24 4.24a2 2 0 0 0 2.83 0l2.83-2.83a2 2 0 0 0 0-2.83z"/><path d="M14 12l-4.24-4.24a2 2 0 0 0-2.83 0L2.83 11.9a2 2 0 0 0 0 2.83L7.07 19a2 2 0 0 0 2.83 0l4.24-4.24"/></svg>`, "INFP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`, "INTP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M12 4v2"/><path d="M12 18v2"/><path d="M4 12h2"/><path d="M18 12h2"/></svg>`, "ESTP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2z"/></svg>`, "ESFP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`, "ENFP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12h-8a2 2 0 1 0 0 4h3a2 2 0 1 1 0 4H4"/><path d="M4 8h13a2 2 0 1 1 0 4H9a2 2 0 1 0 0 4h1"/></svg>`, "ENTP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`, "ESTJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V10"/><path d="M12 10l-4 4"/><path d="M12 10l4 4"/><path d="M12 2L8 6h8L12 2z"/><path d="M4 14h16"/></svg>`, "ESFJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>`, "ENFJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`, "ENTJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`
+            "ISTJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>`,
+            "ISFJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+            "INFJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/><path d="M12 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>`,
+            "INTJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20z"/><path d="M2 12h20"/></svg>`,
+            "ISTP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+            "ISFP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 7.85l-4.24-4.24a2 2 0 0 0-2.83 0l-2.83 2.83a2 2 0 0 0 0 2.83l4.24 4.24a2 2 0 0 0 2.83 0l2.83-2.83a2 2 0 0 0 0-2.83z"/><path d="M14 12l-4.24-4.24a2 2 0 0 0-2.83 0L2.83 11.9a2 2 0 0 0 0 2.83L7.07 19a2 2 0 0 0 2.83 0l4.24-4.24"/></svg>`,
+            "INFP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            "INTP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M12 4v2"/><path d="M12 18v2"/><path d="M4 12h2"/><path d="M18 12h2"/></svg>`,
+            "ESTP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2z"/></svg>`,
+            "ESFP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+            "ENFP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12h-8a2 2 0 1 0 0 4h3a2 2 0 1 1 0 4H4"/><path d="M4 8h13a2 2 0 1 1 0 4H9a2 2 0 1 0 0 4h1"/></svg>`,
+            "ENTP": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+            "ESTJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V10"/><path d="M12 10l-4 4"/><path d="M12 10l4 4"/><path d="M12 2L8 6h8L12 2z"/><path d="M4 14h16"/></svg>`,
+            "ESFJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>`,
+            "ENFJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+            "ENTJ": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`
         };
+        
+        // --- Bilingual Content Object (Full content included below) ---
         const content = {
             th: {
                 title: "เกมจิตวิทยา: การเดินทางค้นหาตัวตน MBTI",
@@ -237,7 +254,7 @@
                 ],
                 results: {
                     "ISTJ": { title: "นักคำนวณ", description: "<b>ลักษณะเด่น:</b> คุณเป็นคนจริงจัง มีความรับผิดชอบสูง และเชื่อถือได้สูงมาก คุณยึดมั่นในข้อเท็จจริง ตรรกะ และหลักการที่พิสูจน์ได้ ทำงานอย่างเป็นระบบและมีระเบียบวินัยเพื่อให้บรรลุเป้าหมายที่วางไว้<br><br><b>สิ่งที่ขับเคลื่อนคุณ:</b> ความมั่นคง ความเป็นระเบียบ และการทำหน้าที่ของตนเองให้สำเร็จลุล่วง คุณเป็นคนที่ซื่อสัตย์และภักดีอย่างยิ่งต่อองค์กรและคนที่คุณรัก" },
-                    "ISFJ": { title: "ผู้พิทักษ์", description: "<b>ลักษณะเด่น:</b> คุณเป็นคนอบอุ่น ใจดี ทุ่มเท และใส่ใจในความต้องการของผู้อื่นอย่างน่าทึ่ง คุณมีความจำดีเยี่ยมในเรื่องรายละเอียดเล็กๆ น้อยๆ ที่เกี่ยวกับคนรอบข้าง และพร้อมจะปกป้องคนที่คุณรักเสมอ<br><br><b>สิ่งที่ขับเคลื่อนคุณ:</b> การสร้างความสามััคคี การช่วยเหลือผู้อื่น และการดูแลรักษาสิ่งที่ดีงามในสังคม คุณรู้สึกดีเมื่อได้เป็นส่วนหนึ่งที่ทำให้คนอื่นมีความสุข" },
+                    "ISFJ": { title: "ผู้พิทักษ์", description: "<b>ลักษณะเด่น:</b> คุณเป็นคนอบอุ่น ใจดี ทุ่มเท และใส่ใจในความต้องการของผู้อื่นอย่างน่าทึ่ง คุณมีความจำดีเยี่ยมในเรื่องรายละเอียดเล็กๆ น้อยๆ ที่เกี่ยวกับคนรอบข้าง และพร้อมจะปกป้องคนที่คุณรักเสมอ<br><br><b>สิ่งที่ขับเคลื่อนคุณ:</b> การสร้างความสามัคคี การช่วยเหลือผู้อื่น และการดูแลรักษาสิ่งที่ดีงามในสังคม คุณรู้สึกดีเมื่อได้เป็นส่วนหนึ่งที่ทำให้คนอื่นมีความสุข" },
                     "INFJ": { title: "ผู้แนะนำ", description: "<b>ลักษณะเด่น:</b> คุณเป็นคนเงียบขรึมแต่มีความมุ่งมั่นสูง เปี่ยมด้วยอุดมการณ์และความคิดสร้างสรรค์ คุณมีความสามารถพิเศษในการเข้าใจผู้คนได้อย่างลึกซึ้ง และมักจะสร้างแรงบันดาลใจให้ผู้อื่นทำสิ่งที่ดีงาม<br><br><b>สิ่งที่ขับเคลื่อนคุณ:</b> การทำตามอุดมการณ์ การช่วยเหลือให้โลกดีขึ้น และการค้นหาความหมายที่ลึกซึ้งของชีวิต คุณมักจะมองเห็นศักยภาพในตัวผู้อื่น" },
                     "INTJ": { title: "นักออกแบบ", description: "<b>ลักษณะเด่น:</b> คุณเป็นนักคิดเชิงกลยุทธ์ที่มีแผนการสำหรับทุกสิ่ง คุณมีความคิดสร้างสรรค์ มองการณ์ไกล และมีความสามารถในการผลักดันความคิดที่ซับซ้อนให้กลายเป็นความจริงได้อย่างน่าทึ่ง<br><br><b>สิ่งที่ขับเคลื่อนคุณ:</b> ความรู้ การพัฒนาตนเอง และการปรับปรุงระบบให้มีประสิทธิภาพสูงสุด คุณไม่หยุดนิ่งที่จะเรียนรู้และมองหาแนวทางที่ดีกว่าเสมอ" },
                     "ISTP": { title: "ผู้เชี่ยวชาญ", description: "<b>ลักษณะเด่น:</b> คุณเป็นคนใจกว้างและยืดหยุ่น เก่งในการแก้ปัญหาเฉพาะหน้าอย่างมีเหตุผล คุณชอบสำรวจและทำความเข้าใจโลกรอบตัวผ่านการลงมือทำจริง และมักจะเยือกเย็นเมื่อเกิดวิกฤต<br><br><b>สิ่งที่ขับเคลื่อนคุณ:</b> การได้ลงมือทำ การแก้ปัญหาที่ท้าทาย และอิสระในการสำรวจสิ่งต่างๆ ด้วยวิธีการของตัวเอง คุณเรียนรู้ได้ดีที่สุดจากประสบการณ์ตรง" },
@@ -304,42 +321,35 @@
                 }
             }
         };
-        
-        // --- NEW: Function to unlock audio on first user interaction ---
-        function handleFirstInteraction() {
-            if (!hasInteracted) {
-                // This call prepares the audio element for future plays.
-                bgMusic.load();
-                hasInteracted = true;
-                // Remove the listeners so they don't fire again.
-                document.body.removeEventListener('click', handleFirstInteraction, true);
-                document.body.removeEventListener('touchend', handleFirstInteraction, true);
-            }
-        }
 
         function setLanguage(lang) {
             currentLanguage = lang;
             document.documentElement.lang = lang;
+            
             document.querySelectorAll('[data-key]').forEach(elem => {
                 const key = elem.getAttribute('data-key');
-                if (content[lang][key]) { elem.innerHTML = content[lang][key]; }
-            });
-            const langBtns = document.querySelectorAll('#language-switcher .control-btn');
-            langBtns.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('data-lang') === lang) {
-                    btn.classList.add('active');
+                if (content[lang][key]) {
+                    elem.innerHTML = content[lang][key];
                 }
             });
+            
+            const langBtns = document.querySelectorAll('#language-switcher .control-btn');
+            langBtns.forEach(btn => btn.classList.remove('active'));
+            if (lang === 'th') {
+                langBtns[0].classList.add('active');
+            } else {
+                langBtns[1].classList.add('active');
+            }
+
+            // Re-render dynamic content if the game is in progress or finished
             if (!questionScreen.classList.contains('hidden')) {
                 displayQuestion();
             } else if (!resultScreen.classList.contains('hidden') && lastResultType) {
-                showResult(lastResultType);
+                showResult();
             }
         }
 
         function toggleMusic() {
-            if (!hasInteracted) handleFirstInteraction(); // Ensure audio is unlocked
             bgMusic.muted = !bgMusic.muted;
             if (bgMusic.muted) {
                 iconSoundOn.classList.add('hidden');
@@ -348,20 +358,17 @@
                 iconSoundOn.classList.remove('hidden');
                 iconSoundOff.classList.add('hidden');
                 if (bgMusic.paused) {
-                    bgMusic.play().catch(error => console.error("Error playing music on toggle:", error));
+                    bgMusic.play().catch(error => console.log("Music play was prevented.", error));
                 }
             }
         }
 
         function startGame() {
-            // The user clicking the start button will have triggered handleFirstInteraction()
             if (!bgMusic.muted && bgMusic.paused) {
                 bgMusic.volume = 0.3;
-                const playPromise = bgMusic.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => console.error("Audio play failed on start:", error));
-                }
+                bgMusic.play().catch(error => console.log("Autoplay was prevented.", error));
             }
+
             currentQuestionIndex = 0;
             userAnswers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
             startScreen.classList.add('hidden');
@@ -387,6 +394,7 @@
                 const card = document.createElement('div');
                 card.classList.add('choice-card', 'fade-in');
                 card.style.animationDelay = `${index * 100}ms`;
+                // Icons for choices are now used from the global 'icons' object
                 card.innerHTML += icons[choice.value];
                 const text = document.createElement('p');
                 text.textContent = choice.text;
@@ -416,17 +424,18 @@
             progressBar.style.width = `${progress}%`;
         }
 
-        function showResult(mbtiType = null) {
-            if (!mbtiType) {
-                mbtiType = calculateResult();
-            }
-            lastResultType = mbtiType;
+        function showResult() {
+            const mbtiType = calculateResult();
+            lastResultType = mbtiType; // Store the result type
             const resultData = content[currentLanguage].results[mbtiType];
+
+            // Icons for results are now used from the global 'resultIcons' object
             resultIconContainer.innerHTML = resultIcons[mbtiType];
             const iconSvg = resultIconContainer.querySelector('svg');
             if(iconSvg) {
                 iconSvg.classList.add('w-20', 'h-20', 'mx-auto', 'text-amber-400');
             }
+
             resultType.textContent = mbtiType;
             resultTitle.textContent = resultData.title;
             resultDescription.innerHTML = resultData.description;
@@ -435,9 +444,10 @@
         }
         
         function restartGame() {
-            lastResultType = null;
+            lastResultType = null; // Reset stored result
             bgMusic.pause();
             bgMusic.currentTime = 0;
+
             resultScreen.classList.add('hidden');
             startScreen.classList.remove('hidden');
             gameContainer.addEventListener('mousemove', handleMouseMove);
@@ -468,14 +478,9 @@
         restartBtn.addEventListener('click', restartGame);
         musicToggleBtn.addEventListener('click', toggleMusic);
         gameContainer.addEventListener('mousemove', handleMouseMove);
-        
-        // NEW: Listen for the first user interaction to unlock audio safely
-        document.body.addEventListener('click', handleFirstInteraction, true);
-        document.body.addEventListener('touchend', handleFirstInteraction, true);
 
         // Set initial language on page load
         setLanguage(currentLanguage);
     </script>
 </body>
 </html>
-
