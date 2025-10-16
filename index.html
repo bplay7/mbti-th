@@ -47,8 +47,8 @@
     <!-- Top Right Controls: Language & Music -->
     <div id="top-right-controls">
         <div id="language-switcher" class="flex items-center gap-2">
-            <button class="control-btn active" onclick="setLanguage('th')">ไทย</button>
-            <button class="control-btn" onclick="setLanguage('en')">EN</button>
+            <button class="control-btn active" data-lang="th" onclick="setLanguage('th')">ไทย</button>
+            <button class="control-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
         </div>
         <button id="music-toggle-btn" class="control-btn">
             <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
@@ -325,8 +325,12 @@
                 if (content[lang][key]) { elem.innerHTML = content[lang][key]; }
             });
             const langBtns = document.querySelectorAll('#language-switcher .control-btn');
-            langBtns.forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.control-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
+            langBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                }
+            });
             if (!questionScreen.classList.contains('hidden')) {
                 displayQuestion();
             } else if (!resultScreen.classList.contains('hidden') && lastResultType) {
@@ -463,7 +467,7 @@
         startBtn.addEventListener('click', startGame);
         restartBtn.addEventListener('click', restartGame);
         musicToggleBtn.addEventListener('click', toggleMusic);
-        gameContainer.addEventListener('mousemove', handleMouseMove);รื
+        gameContainer.addEventListener('mousemove', handleMouseMove);
         
         // NEW: Listen for the first user interaction to unlock audio safely
         document.body.addEventListener('click', handleFirstInteraction, true);
